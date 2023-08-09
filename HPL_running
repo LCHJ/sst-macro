@@ -223,3 +223,116 @@ This report aims to enhance the reader's understanding of the HPL benchmark's op
 通过本报告，我们详细介绍了HPL基准的执行流程，涵盖了各个阶段的任务、调用的函数以及其功能作用。HPL基准的执行流程对于评估计算机系统的性能非常重要，可以帮助我们了解系统在大规模线性代数计算方面的表现。
 
 希望本报告能够帮助读者更深入地理解HPL的工作原理和执行过程。
+
+
+
+# HPL（High-Performance Linpack）分析报告
+
+## 1. 介绍
+
+HPL（High-Performance Linpack）是一种用于评估计算机系统性能的基准，广泛应用于超级计算机和高性能计算领域。它基于Linpack数值线性代数库，通过求解大规模线性代数方程组来测试计算机的浮点运算性能。HPL基准的设计目标是测试计算机在高性能计算工作负载下的性能，特别是对于大规模矩阵运算。
+
+## 2. 基准算法原理
+
+HPL基准的核心算法是基于LU（Lower-Upper）分解和Gaussian消元法。LU分解将一个矩阵分解为下三角矩阵和上三角矩阵，而Gaussian消元法用于求解线性方程组。基准的测试矩阵被分解为这两种形式，然后通过并行计算在多个处理器核心上进行操作。这个过程旨在模拟实际应用中的大规模数值计算，尤其是高性能计算环境。
+
+## 3. 源码程序执行流程
+
+以下是HPL源码程序的执行流程，包括各个阶段的主要任务：
+
+1. **初始化阶段：**
+   - 配置测试矩阵的维度、块大小、处理器网格等参数。
+   - 初始化通信和线程管理环境。
+
+2. **矩阵生成阶段：**
+   - 生成测试矩阵，矩阵元素具有特定的统计分布和性质，以模拟实际应用情况。
+
+3. **数据分发阶段：**
+   - 将生成的矩阵块分发到不同的处理器核心上，以便并行进行LU分解。
+
+4. **LU分解阶段：**
+   - 每个处理器核心执行LU分解，将矩阵分解为下三角矩阵和上三角矩阵。
+
+5. **重排列阶段：**
+   - 根据LU分解的结果，对矩阵数据进行重排列，以优化内存访问模式。
+
+6. **广播阶段：**
+   - 将重排列后的数据广播给其他处理器核心，确保所有核心具有相同的数据。
+
+7. **回代法求解阶段：**
+   - 每个处理器核心执行回代法，解出方程组，得到解向量。
+
+8. **性能评估与汇总阶段：**
+   - 对全局性能进行评估，计算性能指标如GFLOPS。
+
+## 4. 主要思想
+
+HPL基准的主要思想是通过模拟大规模线性代数计算来测试计算机系统在高性能计算工作负载下的性能。它采用LU分解和Gaussian消元法，这些操作在多个处理器核心上并行执行，以考察系统的并行计算性能。通过测试矩阵的生成、分解和求解过程，HPL基准能够全面评估计算机的浮点运算性能。
+
+## 5. 主要函数的功能与思想
+
+- `HPL_pdtest`：主测试函数，控制测试过程的流程。
+- `HPL_pdinfo`：打印系统和测试信息，帮助用户了解测试环境。
+- `HPL_pdtest_spawn`：生成测试矩阵和初始向量，为后续操作提供输入数据。
+- `HPL_pdgesv`：执行LU分解操作，将矩阵分解为下三角和上三角矩阵。
+- `HPL_pdlaswp01T`：在重排列阶段进行局部矩阵重排列，优化内存访问。
+- `HPL_pdtrsv`：执行回代法求解操作，解出方程组，得到解向量。
+- `HPL_pdtest_global`：对全局性能进行评估，计算性能指标如GFLOPS。
+
+通过这些函数的组合，HPL基准能够模拟真实应用中的大规模数值计算，测试计算机系统在高性能计算场景下的性能表现。
+
+# HPL (High-Performance Linpack) Analysis Report
+
+## 1. Introduction
+
+HPL (High-Performance Linpack) is a benchmark extensively used for evaluating the performance of computer systems, particularly in the realm of supercomputing and high-performance computing. It is based on the Linpack numerical linear algebra library and assesses a computer's floating-point computational prowess by solving large-scale linear algebraic systems. The design objective of the HPL benchmark is to test a computer's performance under high-performance computing workloads, specifically focusing on large matrix computations.
+
+## 2. Benchmark Algorithm Principles
+
+The core algorithm of the HPL benchmark is built upon LU (Lower-Upper) decomposition and Gaussian elimination. LU decomposition involves breaking down a matrix into lower triangular and upper triangular matrices, while Gaussian elimination is used to solve linear equation systems. The benchmark's test matrix is decomposed into these two forms and operated on through parallel computation across multiple processor cores. This process aims to simulate large-scale numerical computations, particularly in high-performance computing environments.
+
+## 3. Source Code Program Execution Flow
+
+The following presents the execution flow of the HPL source code program, encompassing the primary tasks in each phase:
+
+1. **Initialization Phase:**
+   - Configure parameters like matrix dimensions, block sizes, processor grids, etc.
+   - Initialize communication and thread management environments.
+
+2. **Matrix Generation Phase:**
+   - Generate a test matrix with specific statistical distributions to emulate real-world scenarios.
+
+3. **Data Distribution Phase:**
+   - Distribute matrix blocks generated earlier across various processor cores for parallel LU decomposition.
+
+4. **LU Decomposition Phase:**
+   - Perform LU decomposition on each processor core, splitting the matrix into lower and upper triangular forms.
+
+5. **Reordering Phase:**
+   - Reorder matrix data according to LU decomposition outcomes to optimize memory access patterns.
+
+6. **Broadcasting Phase:**
+   - Broadcast reordered data to all processor cores to ensure uniformity.
+
+7. **Back Substitution Phase:**
+   - Execute back substitution on each processor core to solve the equation system and obtain solution vectors.
+
+8. **Performance Evaluation and Summary Phase:**
+   - Evaluate global performance, compute metrics like GFLOPS, and produce performance results.
+
+## 4. Key Concepts
+
+The central idea of the HPL benchmark revolves around simulating large-scale numerical computations to evaluate a computer system's performance under high-performance computing conditions. It employs LU decomposition and Gaussian elimination, parallely executed on multiple processor cores, to assess parallel computation performance. Through the generation, decomposition, and solution processes of the test matrix, HPL can comprehensively gauge a computer's floating-point computational prowess.
+
+## 5. Functionality and Concept of Key Functions
+
+- `HPL_pdtest`: Main testing function, orchestrating the flow of the test process.
+- `HPL_pdinfo`: Prints system and test information to provide insights into the test environment.
+- `HPL_pdtest_spawn`: Generates the test matrix and initial vectors as input for subsequent operations.
+- `HPL_pdgesv`: Performs LU decomposition, splitting the matrix into lower and upper triangular forms.
+- `HPL_pdlaswp01T`: Conducts localized matrix reordering during the reordering phase to optimize memory access.
+- `HPL_pdtrsv`: Executes back substitution to solve the equation system and obtain solution vectors.
+- `HPL_pdtest_global`: Evaluates global performance, calculates metrics such as GFLOPS.
+
+By employing these functions in tandem, the HPL benchmark simulates large-scale numerical computations in real-world applications and tests a computer system's performance under high-performance computing scenarios.
+
